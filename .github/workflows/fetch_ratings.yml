@@ -1,0 +1,37 @@
+name: Bewertungen aktualisieren
+
+on:
+  schedule:
+    - cron: '0 8 1 * *'  # 8:00 Uhr am 1. jeden Monats
+  workflow_dispatch:      # manuell auslösbar über GitHub Actions UI
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Abhängigkeiten installieren
+        run: pip install requests
+
+      - name: Bewertungen von ProvenExpert laden
+        env:
+          PE_API_ID:  ${{ secrets.PE_API_ID }}
+          PE_API_KEY: ${{ secrets.PE_API_KEY }}
+        run: python fetch_ratings.py
+
+      - name: Aktualisierte ratings.json committen
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ratings.json
+          git diff --staged --quiet || git commit -m "Bewertungen $(date +'%Y-%m')"
+          git push
