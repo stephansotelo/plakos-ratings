@@ -2,7 +2,7 @@ name: Bewertungen aktualisieren
 
 on:
   schedule:
-    - cron: '0 8 1 * *'  # 8:00 Uhr am 1. jeden Monats
+    - cron: '0 8 * * 1'  # 8:00 Uhr jeden Montag
   workflow_dispatch:      # manuell auslösbar über GitHub Actions UI
 
 permissions:
